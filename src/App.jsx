@@ -10,7 +10,7 @@ import BorrowedBooks from "./components/path/BorrowedBooks";
 import Autentication from "./components/path/Login_Register/Layout";
 
 import { Toaster } from "react-hot-toast";
-import BooksList from "./components/path/categoryBasedBooks/booksList";
+import BooksList from "./components/path/categoryBasedBooks/BooksList";
 import DetailBook from "./components/path/categoryBasedBooks/DetailBook";
 import Updateform from "./components/path/Updateform";
 import ReadPage from "./components/path/ReadPage";
