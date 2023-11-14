@@ -15,19 +15,25 @@ import { UserContext } from "../layout/MainLayout";
 import { useNavigate } from "react-router-dom";
 
 export default function BorrowedBooks() {
-  const [allBooks, setAllBooks] = useState([]);
+  const [allBooks, setAllBooks] = useState("loading");
   const { userData, setUserData } = React.useContext(UserContext);
   const navigate = useNavigate();
 
+  const borrowBooks = () => {
+    axios
+      .get("/getallb")
+      .then((data) => {
+        console.log(data.data);
+        setAllBooks(data.data);
+      })
+      .catch((err) => console.log(err));
+  };
   // chech if use is there
   useLayoutEffect(() => {
     if (userData == null) {
       navigate("/authentication");
     } else {
-      axios
-        .get("/getallb")
-        .then((data) => setAllBooks(data.data))
-        .catch((err) => console.log(err));
+      borrowBooks();
     }
   }, []);
   console.log(userData);
@@ -52,65 +58,90 @@ export default function BorrowedBooks() {
     console.log(id, name);
     axios
       .post("/return", { id: id, name: name })
-      .then((data) => toast.success("Delete Success fully"))
+      .then((data) => {
+        toast.success("Returned Successfully");
+        borrowBooks();
+      })
       .catch((err) => console.log(err));
   };
 
   // console.log(allBooks);
-  return (
-    <div>
-      <CssBaseline />
+
+  if (allBooks == "loading") {
+    return (
+      <>
+        <div className="w-full h-screen flex justify-center items-center">
+          <p className="dark:bg-gray-800 bg-white dark:text-white text-black font-bold text-3xl">
+            Please wait for 20 seconds. We are loading and delivering your
+            content
+          </p>
+        </div>
+      </>
+    );
+  } else {
+    return (
       <div>
-        <p className="text-center font-bold text-5xl dark:text-white text-black mt-16">
-          Borrowed Books
-        </p>
-        <Container sx={{ py: 8 }} maxWidth="md">
-          {/* End hero unit */}
-          <Grid container spacing={4}>
-            {allBooks.map((data, index) => (
-              <Grid item key={index} xs={12} sm={6} md={4}>
-                <Card
-                  sx={{
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                    borderRadius: "4.5%",
-                  }}
-                >
-                  <CardMedia
-                    component="div"
-                    sx={{
-                      // 16:9
-                      pt: "56.25%",
-                    }}
-                    image={data.images[0]}
-                  />
-                  <CardContent sx={{ flexGrow: 1 }}>
-                    <Typography gutterBottom variant="h5" component="h2">
-                      {data.name}
-                    </Typography>
-
-                    <Typography>Category: {data.category}</Typography>
-                    <Typography>
-                      Borrowed Date: {funDate(data.borrowedDate)}
-                    </Typography>
-                    <Typography>
-                      Returned Date: {funDate(data.borrowedDate)}
-                    </Typography>
-
-                    <Button
-                      variant="contained"
-                      onClick={(e) => retunHandle(e, data._id, data.name)}
+        <CssBaseline />
+        <div>
+          <p className="text-center font-bold text-5xl dark:text-white text-black mt-16">
+            Borrowed Books
+          </p>
+          <Container sx={{ py: 8 }} maxWidth="md">
+            {/* End hero unit */}
+            <Grid container spacing={4}>
+              {allBooks.length !== 0 ? (
+                allBooks.map((data, index) => (
+                  <Grid item key={index} xs={12} sm={6} md={4}>
+                    <Card
+                      sx={{
+                        height: "100%",
+                        display: "flex",
+                        flexDirection: "column",
+                        borderRadius: "4.5%",
+                      }}
                     >
-                      Return
-                    </Button>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
+                      <CardMedia
+                        component="div"
+                        sx={{
+                          // 16:9
+                          pt: "56.25%",
+                        }}
+                        image={data.images[0]}
+                      />
+                      <CardContent sx={{ flexGrow: 1 }}>
+                        <Typography gutterBottom variant="h5" component="h2">
+                          {data.name}
+                        </Typography>
+
+                        <Typography>Category: {data.category}</Typography>
+                        <Typography>
+                          Borrowed Date: {funDate(data.borrowedDate)}
+                        </Typography>
+                        <Typography>
+                          Returned Date: {funDate(data.borrowedDate)}
+                        </Typography>
+
+                        <Button
+                          variant="contained"
+                          onClick={(e) => retunHandle(e, data._id, data.name)}
+                        >
+                          Return
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))
+              ) : (
+                <div className="w-full h-screen flex justify-center items-center">
+                  <p className="dark:bg-gray-800 bg-white dark:text-white text-black font-bold text-3xl">
+                    You have not borrow any book yet
+                  </p>
+                </div>
+              )}
+            </Grid>
+          </Container>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 }

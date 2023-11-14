@@ -14,29 +14,48 @@ import { UserContext } from "../../layout/MainLayout";
 export default function BooksList() {
   const location = useLocation();
   const categoryName = location.state.toLowerCase();
-  const [books, setBooks] = useState(null);
+  const [books, setBooks] = useState("loading");
   const { userData, setUserData } = useContext(UserContext);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+
+  const getBooks = () => {
+    setLoading(true);
+    axios
+      .post("/getbycategory", { category: categoryName })
+      .then((data) => {
+        const booksData = data.data;
+        setBooks(booksData);
+      })
+      .catch((err) => {
+        setBooks(null);
+      });
+  };
 
   useLayoutEffect(() => {
     if (userData == null) {
       navigate("/authentication");
     } else {
-      axios
-        .post("/getbycategory", { category: categoryName })
-        .then((data) => {
-          const booksData = data.data;
-          setBooks(booksData);
-        })
-        .catch((err) => setBooks(null));
+      getBooks();
     }
   }, []);
 
-  if (books == null) {
+  if (books === null) {
     return (
       <>
         <div className="bg-white w-full h-screen flex justify-center items-center">
           <p className="text-[3rem] font-medium">NO books found</p>
+        </div>
+      </>
+    );
+  } else if (books === "loading") {
+    return (
+      <>
+        <div className="w-full h-screen flex justify-center items-center">
+          <p className="dark:bg-gray-800 bg-white dark:text-white text-black font-bold text-3xl">
+            Please wait for 20 seconds. We are loading and delivering your
+            content
+          </p>
         </div>
       </>
     );
@@ -46,9 +65,6 @@ export default function BooksList() {
         <div>
           <CssBaseline />
           <div>
-            <p className="text-center font-bold text-5xl dark:text-white text-black mt-16">
-              Top rated books
-            </p>
             <Container sx={{ py: 8 }} maxWidth="md">
               {/* End hero unit */}
               <Grid container spacing={4}>
@@ -74,7 +90,7 @@ export default function BooksList() {
                         <Typography gutterBottom variant="h5" component="h2">
                           {data.name}
                         </Typography>
-                        <Typography>Author Name: ${data.authorName}</Typography>
+                        <Typography>Author Name: {data.authorName}</Typography>
                         <Typography>Category: {data.category}</Typography>
                         <Typography>Rating: {data.rating[0]}</Typography>
                         <Typography>Quentity: {data.quantity}</Typography>

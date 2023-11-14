@@ -17,7 +17,12 @@ const style = {
   p: 4,
 };
 
-export default function BasicModal({ disable, bookData, userData }) {
+export default function BasicModal({
+  disable,
+  bookData,
+  userData,
+  getBookData,
+}) {
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -31,12 +36,18 @@ export default function BasicModal({ disable, bookData, userData }) {
     e.preventDefault();
     const date = retunRef.current.value;
     // console.log(date)
-    axios.post("/borrow", {
-      id: bookData._id,
-      personName: userData.email,
-      personGmail: userData.email,
-      returnDate: date,
-    }).then((data)=>toast.success('You successfully borrowed this book')).catch(err=>console.log(err))
+    axios
+      .post("/borrow", {
+        id: bookData._id,
+        personName: userData.email,
+        personGmail: userData.email,
+        returnDate: date,
+      })
+      .then((data) => {
+        toast.success("You successfully borrowed this book");
+        getBookData();
+      })
+      .catch((err) => toast.error("Already borrowed this book"));
   };
 
   return (

@@ -7,11 +7,12 @@ import { UserContext } from "../../layout/MainLayout";
 
 export default function DetailBook() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const data = location.state;
+  const { state } = useLocation();
+  const data = state;
   //   console.log(data);
   const [btn, setBtn] = useState([]);
   const { userData, setUserData } = useContext(UserContext);
+  const [book, setBook] = useState(data);
 
   //   console.log(data._id)
   useLayoutEffect(() => {
@@ -30,6 +31,21 @@ export default function DetailBook() {
     }
   }, []);
 
+  const getBookData = () => {
+    axios
+      .post("/getbyid", {
+        id: data._id,
+      })
+      .then((data) => {
+        // console.log(data.data);
+        setBook(data.data);
+        setBtn([]);
+      })
+      .catch((err) => console.log(err));
+  };
+
+console.log(btn)
+
   return (
     <div className="w-full pt-7 flex flex-col justify-center items-center dark:text-white text-black">
       <img src={data.images} alt={data.name} className="w-auto h-[25rem]" />
@@ -39,20 +55,30 @@ export default function DetailBook() {
           <span className="font-bold">Description:</span>{" "}
           {data.shortDescription.slice(0, 75)}
         </p>
-        <p>Quentity: {data.quantity}</p>
+        <p>Quentity: {book.quantity}</p>
         <p>Rating: {data.rating[0]}</p>
       </div>
       {/* {console.log(data.quantity)} */}
       <div className="flex gap-4 mt-6 mb-6">
         {btn.length == 0 && data.quantity > 0 ? (
-          <BasicModal disable={false} bookData={data} userData={userData} />
+          <BasicModal
+            disable={false}
+            bookData={data}
+            userData={userData}
+            getBookData={getBookData}
+          />
         ) : (
-          <BasicModal disable={true} bookData={data} userData={userData} />
+          <BasicModal
+            disable={true}
+            bookData={data}
+            userData={userData}
+            getBookData={getBookData}
+          />
         )}
 
-<Link to={`/read`} state={data}>
-        <Button variant="outlined">Read</Button>
-</Link>
+        <Link to={`/read`} state={data}>
+          <Button variant="outlined">Read</Button>
+        </Link>
       </div>
     </div>
   );
