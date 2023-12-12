@@ -3,6 +3,7 @@ import Footer from "../shared/Footer";
 import Navbar from "../shared/Navbar";
 import { checkUser } from "../../lib/firebase";
 import { useEffect, createContext, useState } from "react";
+import axios from "../../lib/axios";
 
 export const UserContext = createContext();
 export default function LayoutMain() {
@@ -10,6 +11,9 @@ export default function LayoutMain() {
   const [userData, setUserData] = useState("loading");
   useEffect(() => {
     checkUser(setUserData);
+    axios.get("/getall").then((data) => {
+      console.log("First time called");
+    });
   }, []);
 
   return (
