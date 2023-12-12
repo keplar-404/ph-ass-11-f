@@ -1,7 +1,7 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 
-axios.defaults.baseURL = "https://phb.onrender.com";
+axios.defaults.baseURL = "https://ph-11-b.onrender.com/";
 
 // Request interceptor to add access token and refresh token to the request body
 axios.interceptors.request.use(
