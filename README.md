@@ -12,4 +12,5 @@ https://ph-11-f.onrender.com/
 
 ## Technology
 **Frontend:** React, React-router, Js-cookie, Firebase
+
 **Backend:** https://github.com/keplar-404/ph-ass-11-b
